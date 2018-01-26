@@ -8,7 +8,7 @@ workspace "virtual-addressing"
 
   filter { "action:gmake*", "toolset:gcc" }
     buildoptions {
-      "-Wall", "-std=c11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror",
+      "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror",
       "-fverbose-asm", "-Wint-to-pointer-cast", "-Wshadow", "-Wpointer-arith",
       "-Wcast-align", "-Wcast-qual", "-Wunreachable-code", "-Wstrict-overflow=5",
       "-Wwrite-strings", "-Wconversion", "--pedantic-errors",
@@ -32,18 +32,18 @@ workspace "virtual-addressing"
   project "example"
     kind "consoleapp"
 
-    files { path.join("src", "example.c") }
+    files { path.join("src", "example.cpp") }
     links { "virt-addr" }
 
   project "virt-addr"
     kind "staticlib"
 
-    files { path.join("src", "unify_vaddr.c") }
+    files { path.join("src", "unify_vaddr.cpp") }
 
   project "test"
     kind "consoleapp"
 
-    files { path.join("src", "test", "*.c") }
+    files { path.join("src", "test", "*.cpp") }
     links { "criterion", "virt-addr" }
 
     targetname "test_vaddr"

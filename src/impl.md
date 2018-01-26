@@ -7,9 +7,6 @@
 * **locations** indexing and searching
   * **searching** get index, given value constraints
   * **indexing** get value, given index
-* **namespaces** function name organisation
-  * **ns_construct** creating namespace function structs
-  * **ns_destruct** destroying namespace function structs
 * **mutations**
   * **modifying** by-value inserting, deleting, extending, changing
   * **transforming** sorting, reversing, mapping, filtering, reducing
