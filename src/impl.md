@@ -2,8 +2,8 @@
   * **construct** creating new (empty-ish) vaddrs
   * **destruct** demolishing vaddr arrays
 * **ctypes** raw C pointers to and from virtual addressing
-  * **ctypes_in** transforming C types to vaddrs
-  * **ctypes_out** transforming vaddrs to C types
+  * **in** transforming C types to vaddrs
+  * **out** transforming vaddrs to C types
 * **locations** indexing and searching
   * **searching** get index, given value constraints
   * **indexing** get value, given index
@@ -13,9 +13,9 @@
 * **attributes** convert / interpret properties of vaddrs
   * **ranges** conversions to / from range notation
   * **metadata** get/set metadata, flags etc
-* **visualising** string representations of vaddrs
-  * **repr_in** creating vaddrs from string / human data
-  * **repr_out** displaying vaddrs as human-readable
+* **visualisations** string representations of vaddrs
+  * **in** creating vaddrs from string / human data
+  * **out** displaying vaddrs as human-readable
 
 a vaddr (virtual address object) is a two-dimensional array. its elements are "triples", which are 2 or 3-element arrays of `uint64_t`.
 

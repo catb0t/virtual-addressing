@@ -1,12 +1,18 @@
 workspace "virtual-addressing"
 
+  language "C++"
+
+  cppdialect "C++11"
+
   configurations { "dbg", "dist" }
 
   flags { "fatalwarnings" }
 
   targetdir "bin/%{cfg.buildcfg}/"
 
-  filter { "action:gmake*", "toolset:gcc" }
+  buildoptions { "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror" }
+
+  filter { "action:gmake*", "toolset:gcc", "language:c" }
     buildoptions {
       "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror",
       "-fverbose-asm", "-Wint-to-pointer-cast", "-Wshadow", "-Wpointer-arith",
@@ -38,7 +44,31 @@ workspace "virtual-addressing"
   project "virt-addr"
     kind "staticlib"
 
-    files { path.join("src", "unify_vaddr.cpp") }
+    links { "attrs", "ctypes", "lifes", "locats", "muts", "vis" }
+
+  project "attrs"
+    kind "staticlib"
+    files { path.join("src", "raw", "attributes.cpp") }
+
+  project "ctypes"
+    kind "staticlib"
+    files { path.join("src", "raw", "ctypes.cpp") }
+
+  project "lifes"
+    kind "staticlib"
+    files { path.join("src", "raw", "lifetimes.cpp") }
+
+  project "locats"
+    kind "staticlib"
+    files { path.join("src", "raw", "locations.cpp") }
+
+  project "muts"
+    kind "staticlib"
+    files { path.join("src", "raw", "mutations.cpp") }
+
+  project "vis"
+    kind "staticlib"
+    files { path.join("src", "raw", "visualisations.cpp") }
 
   project "test"
     kind "consoleapp"

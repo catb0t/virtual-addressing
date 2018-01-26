@@ -2,6 +2,8 @@
 #define VA_VIRTADDR_H
 
 #include <cstdint>
+#include <cstddef>
+#include <cstdlib>
 
 #ifndef alloc
   #define alloc(type, size) malloc((sizeof (type)) * (size))
@@ -34,9 +36,12 @@ namespace virtual_addressing {
   };*/
 
   namespace lifetimes {
-    virtaddr_t make_new (const bool use_range_notation);
-    virtaddr_t make_new (const virtual_addressing::index_t length, const bool use_range_notation);
-    virtaddr_t make_new (const virtual_addressing::value_t* source, const virtual_addressing::index_t length, const bool use_range_notation);
+    virtaddr_t giveth (const bool use_range_notation);
+    virtaddr_t giveth (const virtual_addressing::index_t length, const bool use_range_notation);
+    virtaddr_t giveth (const virtual_addressing::value_t* source, const virtual_addressing::index_t length, const bool use_range_notation);
+
+    void taketh (virtaddr_t vaddr);
+    void taketh (virtaddr_t vaddr...);
   }
 
   namespace ctypes {
@@ -55,6 +60,11 @@ namespace virtual_addressing {
     }
   }
 
+  namespace mutations {
+    namespace modifying {}
+    namespace transforming {}
+  }
+
   namespace attributes {
     namespace metadata {
                           bool    is_range_notation (const virtual_addressing::virtaddr_t);
@@ -65,6 +75,11 @@ namespace virtual_addressing {
       virtual_addressing::virtaddr_t to_range_notation (const virtual_addressing::virtaddr_t);
       virtual_addressing::virtaddr_t to_count_notation (const virtual_addressing::virtaddr_t);
     }
+  }
+
+  namespace visualisations {
+    namespace in {}
+    namespace out {}
   }
 
 }

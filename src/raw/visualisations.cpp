@@ -1,8 +1,7 @@
-// transforming vaddrs to C types
+// string representations of vaddrs
 #include "../virtaddr.hpp"
-
 namespace virtual_addressing {
-    namespace ctypes {
+  namespace visualisations {
     namespace in {}
     namespace out {}
   }
