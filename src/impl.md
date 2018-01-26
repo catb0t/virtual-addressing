@@ -1,13 +1,24 @@
-* **attributes** metadata and properties of vaddr arrays
-* **construct** creating new (empty-ish) vaddrs
-* **ctypes_in** transforming C types to vaddrs
-* **ctypes_out** transforming vaddrs to C types
-* **destruct** demolishing vaddr arrays
-* **indexing** finding values, given indicies
-* **modifying** inserting, deleting, extending, and "mutating"
-* **searching** locating values, given constraints
-* **transforming** sorting, reversing, mapping, filtering, reducing
+* **lifetimes** controlling lifetimes of vaddrs
+  * **construct** creating new (empty-ish) vaddrs
+  * **destruct** demolishing vaddr arrays
+* **ctypes** raw C pointers to and from virtual addressing
+  * **ctypes_in** transforming C types to vaddrs
+  * **ctypes_out** transforming vaddrs to C types
+* **locations** indexing and searching
+  * **searching** get index, given value constraints
+  * **indexing** get value, given index
+* **namespaces** function name organisation
+  * **ns_construct** creating namespace function structs
+  * **ns_destruct** destroying namespace function structs
+* **mutations**
+  * **modifying** by-value inserting, deleting, extending, changing
+  * **transforming** sorting, reversing, mapping, filtering, reducing
+* **attributes** convert / interpret properties of vaddrs
+  * **ranges** conversions to / from range notation
+  * **metadata** get/set metadata, flags etc
 * **visualising** string representations of vaddrs
+  * **repr_in** creating vaddrs from string / human data
+  * **repr_out** displaying vaddrs as human-readable
 
 a vaddr (virtual address object) is a two-dimensional array. its elements are "triples", which are 2 or 3-element arrays of `uint64_t`.
 
@@ -15,7 +26,7 @@ when R (explicit range notation) is not enabled the structure is
 ```
 A = [
   [L S R] - L: number of triples following S: spoofing virtual length R: using range notation
-  [V Z 0] - V: a non-zero value Z: the number of zeroes preceding the value 0: zerp (unused field)
+  [V Z 0] - V: a non-zero value Z: the number of zeroes preceding V 0: zero (unused field)
   [V Z 0] - ...
   ...
   NULL  - a null terminator, for simpler iteration.
