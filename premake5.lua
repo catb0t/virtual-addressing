@@ -10,23 +10,28 @@ workspace "virtual-addressing"
 
   targetdir "bin/%{cfg.buildcfg}/"
 
-  buildoptions { "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror" }
+  flags { "linktimeoptimization" }
 
-  filter { "action:gmake*", "toolset:gcc", "language:c" }
+  filter { "action:gmake*" }
     buildoptions {
       "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror",
       "-fverbose-asm", "-Wint-to-pointer-cast", "-Wshadow", "-Wpointer-arith",
       "-Wcast-align", "-Wcast-qual", "-Wunreachable-code", "-Wstrict-overflow=5",
       "-Wwrite-strings", "-Wconversion", "--pedantic-errors",
-      "-Wredundant-decls", "-Werror=maybe-uninitialized",
-      "-Wmissing-declarations", "-Wmissing-parameter-type",
-      "-Wmissing-prototypes", "-Wnested-externs", "-Wold-style-declaration",
-      "-Wold-style-definition", "-Wstrict-prototypes", "-Wpointer-sign"
+      "-Wredundant-decls", "-Wmissing-declarations", "-Werror=uninitialized"
     }
-    flags { "linktimeoptimization" }
+
+  filter { "toolset:gcc" }
+    buildoptions {
+      "-Werror=maybe-uninitialized"
+    }
+
 
   filter "configurations:dbg"
-    buildoptions { "-ggdb", "-O0", "-g3" }
+    buildoptions {
+      "-ggdb", "-O0", "-ggdb3", 
+      -- "-fsanitize=address", "-fstack-protector", "-fsanitize=undefined"
+    }
     symbols "on"
     optimize "off"
 
@@ -39,7 +44,10 @@ workspace "virtual-addressing"
     kind "consoleapp"
 
     files { path.join("src", "example.cpp") }
-    links { "virt-addr" }
+    links {
+      "virt-addr", "attrs", "ctypes", "lifes", "locats", "muts", "vis",
+      -- "asan", "ubsan"
+    }
 
   project "virt-addr"
     kind "staticlib"
@@ -74,7 +82,10 @@ workspace "virtual-addressing"
     kind "consoleapp"
 
     files { path.join("src", "test", "*.cpp") }
-    links { "criterion", "virt-addr" }
+    links {
+      "criterion", "virt-addr", "attrs", "ctypes", "lifes", "locats", "muts", "vis",
+      -- "asan", "ubsan"
+    }
 
     targetname "test_vaddr"
 
