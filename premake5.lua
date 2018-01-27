@@ -1,5 +1,8 @@
 workspace "virtual-addressing"
 
+  language "C"
+  cdialect "C11"
+
   configurations { "dbg", "dist" }
 
   flags { "fatalwarnings" }

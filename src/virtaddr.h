@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stdint.h>
+#include <string.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdarg.h>
@@ -21,14 +22,24 @@
   #define I(obj, mth, args, ...) obj->mth(obj, args, __VA_ARGS__)
 #endif
 
-// a triple is 2 or 3 uint64_ts
-typedef uint64_t* triple_t;
+#define TRIPLE_LENGTH 3
+
+typedef size_t index_t;
+typedef uint64_t value_t;
+
+// just a more useful name
+typedef value_t triple_atom_t;
+
+// a triple is just 3 atom_ts
+typedef triple_atom_t* triple_t;
 
 /*
   a vaddr array is a NULL-terminated list of triples
   remember, this is of type triple_t* aka uint64_t** !!
+
+  equivalent to triple_t*
 */
-typedef triple_t* virtaddr_t;
+typedef triple_atom_t** virtaddr_t;
 
 /*
   controlling lifetimes of virtaddr_ts
