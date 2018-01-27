@@ -14,7 +14,7 @@
 #endif
 
 #ifndef set_out_param
-  #define set_out_param(name, value) do { if ( NULL != (name) ){ *name = value; } } while(0)
+  #define set_out_param(name, value) if ( NULL != (name) ){ *name = value; }
 #endif
 
 #ifndef I
@@ -49,16 +49,6 @@ typedef struct st_lifetimes_ns {
   void (*dtor_n) (const size_t len, virtaddr_t const, ...);
 } lifetimes_ns;
 
-/*
-  ctypes <=> vaddrs
-*/
-typedef struct st_ctypes_ns {
-  bool (*x) (bool);
-} ctypes_ns;
-
-/*
-  
-*/
 
 /*
   reading and inferring metadata and attributes of virtaddr_ts
