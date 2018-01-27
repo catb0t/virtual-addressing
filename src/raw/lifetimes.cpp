@@ -72,12 +72,10 @@ namespace virtual_addressing {
     void taketh (const virtaddr_t vaddr) {
       const index_t count_triples = virtual_addressing::attributes::metadata::real_length(vaddr);
 
-      if (0 == count_triples) {
-        return;
-      }
-
-      for (size_t i = 0; i < count_triples - 1; i++) {
-        std::free( vaddr[i] );
+      if (count_triples > 0) {
+        for (size_t i = 0; i < count_triples - 1; i++) {
+          std::free( vaddr[i] );
+        }
       }
       std::free( vaddr );
     }
