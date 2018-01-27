@@ -22,6 +22,8 @@
   #define I(obj, mth, args, ...) obj->mth(obj, args, __VA_ARGS__)
 #endif
 
+#define nbytes(type, size) ((sizeof (type)) * (size))
+
 #define TRIPLE_LENGTH 3
 
 typedef size_t index_t;
@@ -49,6 +51,8 @@ virtaddr_t       lifetimes_ctor (const size_t, const bool);
 virtaddr_t  lifetimes_ctor_from (const uint64_t* const, const size_t, const bool);
 void             lifetimes_dtor (const virtaddr_t);
 void           lifetimes_dtor_n (const size_t, const virtaddr_t, ...);
+
+triple_t lifetimes_make_first_triple (const value_t count_triples, const value_t virtual_length, const bool range_notation);
 
 typedef struct st_lifetimes_ns lifetimes_ns;
 typedef struct st_lifetimes_ns {
