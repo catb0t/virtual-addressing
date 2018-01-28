@@ -1,3 +1,11 @@
+function table.reverse(a)
+    local res = {}
+    for i = #a, 1, -1 do
+        res[#res+1] = a[i]
+    end
+    return res
+end
+
 workspace "virtual-addressing"
 
   language "C++"
@@ -8,9 +16,9 @@ workspace "virtual-addressing"
 
   flags { "fatalwarnings" }
 
-  targetdir "bin/%{cfg.buildcfg}/"
+  buildoptions { "-Wl,--no-as-needed" }
 
-  flags { "linktimeoptimization" }
+  targetdir "bin/%{cfg.buildcfg}/"
 
   filter { "action:gmake*" }
     buildoptions {
@@ -25,11 +33,12 @@ workspace "virtual-addressing"
     buildoptions {
       "-Werror=maybe-uninitialized"
     }
+    flags { "linktimeoptimization" }
 
 
   filter "configurations:dbg"
     buildoptions {
-      "-ggdb", "-O0", "-ggdb3", 
+      "-ggdb", "-O0", "-ggdb3", "-fno-omit-frame-pointer"
       -- "-fsanitize=address", "-fstack-protector", "-fsanitize=undefined"
     }
     symbols "on"
@@ -40,52 +49,51 @@ workspace "virtual-addressing"
     symbols "off"
     optimize "full"
 
+  filter {}
+
+  local proj_names = {}
+
+  for _, file in ipairs(os.matchfiles("src/raw/*.cpp")) do
+    local basename = string.explode(file, "/")[3]
+    local ident = string.explode(basename, "%.")[1]
+    -- print("ident", ident)
+    table.insert(proj_names, ident)
+    project "*"
+
+    project ( ident )
+      kind ( "staticlib" )
+      files ( { file } )
+
+    project "*"
+  end
+
+  local main_project = "virt_addr"
+
+  local base_links = table.merge(proj_names, { [20] = main_project })
+
+  -- for k, v in next, base_links do print(k, v) end
+
   project "example"
     kind "consoleapp"
 
     files { path.join("src", "example.cpp") }
-    links {
-      "virt-addr", "attrs", "ctypes", "lifes", "locats", "muts", "vis",
-      -- "asan", "ubsan"
-    }
+    links ( base_links )
 
-  project "virt-addr"
+  project(main_project)
     kind "staticlib"
-
-    links { "attrs", "ctypes", "lifes", "locats", "muts", "vis" }
-
-  project "attrs"
-    kind "staticlib"
-    files { path.join("src", "raw", "attributes.cpp") }
-
-  project "ctypes"
-    kind "staticlib"
-    files { path.join("src", "raw", "ctypes.cpp") }
-
-  project "lifes"
-    kind "staticlib"
-    files { path.join("src", "raw", "lifetimes.cpp") }
-
-  project "locats"
-    kind "staticlib"
-    files { path.join("src", "raw", "locations.cpp") }
-
-  project "muts"
-    kind "staticlib"
-    files { path.join("src", "raw", "mutations.cpp") }
-
-  project "vis"
-    kind "staticlib"
-    files { path.join("src", "raw", "visualisations.cpp") }
+    -- don't link main_project to itself
+    links ( proj_names )
 
   project "test"
     kind "consoleapp"
 
-    files { path.join("src", "test", "*.cpp") }
-    links {
-      "criterion", "virt-addr", "attrs", "ctypes", "lifes", "locats", "muts", "vis",
-      -- "asan", "ubsan"
-    }
+    files { path.join("src", "test", "test_*.cpp") }
+
+    local test_links = table.merge({ [7] = "criterion" }, base_links)
+    test_links = table.reverse(test_links)
+    -- for k, v in next, test_links do print(k, v) end
+
+    links ( test_links )
 
     targetname "test_vaddr"
 
