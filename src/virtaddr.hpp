@@ -8,7 +8,7 @@
 #include <cstring>
 
 #ifndef alloc
-  #define alloc(type, size) (malloc(( nbytes(type, size) )))
+  #define alloc(type, size) (std::malloc(( nbytes(type, size) )))
 #endif
 
 #ifndef set_out_param
@@ -52,20 +52,24 @@ namespace virtual_addressing {
 
   namespace lifetimes {
 
-    namespace triples {
-      virtual_addressing::triple_t first_triple (const value_t count_triples, const value_t virtual_length, const bool range_notation);
+    namespace triple_building {
+      triple_t first_triple (const value_t count_triples, const value_t virtual_length, const bool range_notation);
 
-      virtual_addressing::triple_t triple (const value_t value, const value_t zeroes);
-      virtual_addressing::triple_t triple (const virtual_addressing::value_t value, const virtual_addressing::index_t bottom, const virtual_addressing::index_t top);
+      triple_t triple (const value_t value, const value_t zeroes);
+      triple_t triple (const value_t value, const index_t bottom, const index_t top);
     }
 
-    virtual_addressing::virtaddr_t giveth (const bool use_range_notation);
-    virtual_addressing::virtaddr_t giveth (const virtual_addressing::index_t length, const bool use_range_notation);
-    virtual_addressing::virtaddr_t giveth (const virtual_addressing::value_t* source, const virtual_addressing::index_t length, const bool use_range_notation);
+    namespace copying {
+      virtaddr_t copy (const virtaddr_t va);
+    }
 
-    void taketh (const virtual_addressing::virtaddr_t vaddr);
-    void taketh (const virtual_addressing::virtaddr_t* vaddr, const virtual_addressing::index_t length);
-    void taketh (const virtual_addressing::index_t argc, const virtual_addressing::virtaddr_t n_vaddr, ...);
+    virtaddr_t giveth (const bool use_range_notation);
+    virtaddr_t giveth (const index_t length, const bool use_range_notation);
+    virtaddr_t giveth (const value_t* source, const index_t length, const bool use_range_notation);
+
+    void taketh (const virtaddr_t vaddr);
+    void taketh (const virtaddr_t* vaddr, const index_t length);
+    void taketh (const index_t argc, const virtaddr_t n_vaddr, ...);
   }
 
   namespace ctypes {
@@ -75,12 +79,16 @@ namespace virtual_addressing {
 
   namespace locations {
     namespace searching {
-      virtual_addressing::index_t linear_search (const virtual_addressing::virtaddr_t, const virtual_addressing::value_t value);
-      virtual_addressing::index_t binary_search (const virtual_addressing::virtaddr_t, const virtual_addressing::value_t value);
+      index_t linear_search (const virtaddr_t, const value_t value);
+      index_t binary_search (const virtaddr_t, const value_t value);
     }
     namespace indexing {
-      virtual_addressing::value_t    get (const virtual_addressing::virtaddr_t, const virtual_addressing::index_t index);
-      virtual_addressing::virtaddr_t set (const virtual_addressing::virtaddr_t, const virtual_addressing::index_t index, const virtual_addressing::value_t value);
+      value_t    get (const virtaddr_t, const index_t index);
+      virtaddr_t set (const virtaddr_t, const index_t index, const value_t value);
+
+      namespace implementation {
+        value_t get_linear_search (const virtaddr_t va, const index_t);
+      }
     }
   }
 
@@ -91,18 +99,30 @@ namespace virtual_addressing {
 
   namespace attributes {
     namespace metadata {
-      bool is_range_notation (const virtual_addressing::virtaddr_t);
+      namespace getting {
+        bool is_range_notation (const virtaddr_t);
+        index_t virtual_length (const virtaddr_t);
+        index_t    real_length (const virtaddr_t);
+      }
 
-      virtual_addressing::index_t virtual_length (const virtual_addressing::virtaddr_t);
-      virtual_addressing::index_t virtual_length (const virtual_addressing::triple_atom_t* const * const va);
+      namespace setting {
+        virtaddr_t is_range_notation (const virtaddr_t, const bool);
+        virtaddr_t    virtual_length (const virtaddr_t, const value_t);
+        virtaddr_t       real_length (const virtaddr_t, const value_t);
+      }
 
-      virtual_addressing::index_t real_length (const virtual_addressing::virtaddr_t);
-      virtual_addressing::index_t real_length (const virtual_addressing::triple_atom_t* const * const va);
+
+      namespace deducing {
+        bool is_range_notation (const virtaddr_t);
+        index_t virtual_length (const virtaddr_t);
+        index_t    real_length (const virtaddr_t);
+      }
+
     }
 
     namespace ranges {
-      virtual_addressing::virtaddr_t to_range_notation (const virtual_addressing::virtaddr_t);
-      virtual_addressing::virtaddr_t to_count_notation (const virtual_addressing::virtaddr_t);
+      virtaddr_t to_range_notation (const virtaddr_t);
+      virtaddr_t to_count_notation (const virtaddr_t);
     }
   }
 
