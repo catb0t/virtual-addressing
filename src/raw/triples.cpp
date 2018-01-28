@@ -8,6 +8,10 @@ namespace virtual_addressing {
     }
 
     namespace flags {
+      flag_holder_t holder (void) {
+        return flag_holder_t {};
+      }
+
       flag_holder_t holder (const flag_each_t* fl) {
 
         flag_holder_t total = 0;
@@ -42,15 +46,17 @@ namespace virtual_addressing {
       /*
         make any triple
       */
-      triple_t triple (const value_t value, const value_t zeroes) {
-        const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {value, zeroes, 0};
+      triple_t giveth (void) {
+        return triples::lifetimes::giveth(0, 0);
+      }
 
+      triple_t giveth (const value_t value, const value_t zeroes) {
+        const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {value, zeroes, 0 };
         return triples::lifetimes::copy(stack_data);
       }
 
-      triple_t triple (const value_t value, const index_t bottom, const index_t top) {
+      triple_t giveth (const value_t value, const index_t bottom, const index_t top) {
         const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {value, bottom, top};
-
         return triples::lifetimes::copy(stack_data);
       }
 
@@ -61,6 +67,28 @@ namespace virtual_addressing {
       triple_t copy (const triple_atom_t* const triple) {
         return triples::lifetimes::_impl_copy(triple);
       }
+
+      void taketh (const triple_t trp) {
+        std::free(trp);
+      }
+      void taketh (triple_t* const trps, const index_t length) {
+        for (size_t i = 0; i < length; i++) {
+          taketh(trps[i]);
+        }
+        std::free(trps);
+      }
+      void taketh (const index_t argc, const triple_t trp, ...) {
+        va_list va;
+        va_start(va, trp);
+
+        for (size_t i = 0; i < argc; i++) {
+          auto t = static_cast<triple_t> (va_arg(va, triple_t));
+          taketh(t);
+        }
+        va_end(va);
+      }
+
+      /* STATIC LOCAL IMPLEMENTATIONS FOLLOW */
 
       static triple_t _impl_copy (const void* const triple) {
         return (triple_t)

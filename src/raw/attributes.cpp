@@ -129,20 +129,24 @@ namespace virtual_addressing {
         */
         index_t real_length (const virtaddr_t va) {
           index_t len = 0;
-
-          // saves us adding 1 at the end
+          // don't add 1 because we are not counting triple #0
           while (nullptr != va[ len ]) {
             len++;
           }
-
           return len;
         }
       }
     }
 
     namespace slices {
-      virtaddr_t to_slice_notation (const virtaddr_t, const bool /* = false */) { return {}; }
-      virtaddr_t to_count_notation (const virtaddr_t, const bool /* = false */) { return {}; }
+      virtaddr_t to_slice_notation (const virtaddr_t, const bool no_check /* = false */) {
+        (void) no_check;
+        return {};
+      }
+      virtaddr_t to_count_notation (const virtaddr_t, const bool no_check /* = false */) {
+        (void) no_check;
+        return {};
+      }
     }
   }
 }

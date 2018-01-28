@@ -73,19 +73,51 @@ namespace virtual_addressing {
 
       typedef value_t flag_holder_t;
 
+      flag_holder_t holder (void);
       flag_holder_t holder (const flag_each_t* fl);
+
       bool has (const flag_holder_t, const flag_each_t);
     }
 
-    namespace attributes {}
+    namespace attributes {
+      namespace metadata {
+        namespace getting {
+          triple_atom_t  first (const triple_t);
+          triple_atom_t second (const triple_t);
+          triple_atom_t  third (const triple_t);
+        }
+
+        namespace setting {
+          triple_t  first (const triple_atom_t);
+          triple_t second (const triple_atom_t);
+          triple_t  third (const triple_atom_t);
+
+        }
+
+        namespace deducing {
+          triple_atom_t third (const triple_t);
+        }
+      }
+
+      namespace slices {
+        virtaddr_t to_slice_notation (const virtaddr_t, const bool = false);
+        virtaddr_t to_count_notation (const virtaddr_t, const bool = false);
+      }
+    }
+
     namespace lifetimes {
       triple_t first_triple (const value_t, const value_t, const triples::flags::flag_holder_t);
 
-      triple_t triple (const value_t, const value_t);
-      triple_t triple (const value_t, const index_t, const index_t);
+      triple_t giveth (void);
+      triple_t giveth (const value_t, const value_t);
+      triple_t giveth (const value_t, const index_t, const index_t);
 
       triple_t copy (const triple_t);
       triple_t copy (const triple_atom_t* const);
+
+      void taketh (const triple_t);
+      void taketh (triple_t* const, const index_t);
+      void taketh (const index_t, const triple_t, ...);
     }
     namespace mutations {}
   }
