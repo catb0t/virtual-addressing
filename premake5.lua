@@ -45,7 +45,7 @@ workspace "virtual-addressing"
     optimize "off"
 
   filter "configurations:dist"
-    buildoptions { "-fomit-frame-pointer", "-g", "-O3" }
+    buildoptions { "-fomit-frame-pointer", "-O3" }
     symbols "off"
     optimize "full"
 
@@ -68,9 +68,7 @@ workspace "virtual-addressing"
   end
 
   local main_project = "virt_addr"
-
-  local base_links = table.merge(proj_names, { [20] = main_project })
-
+  local base_links = table.merge(proj_names, { [#proj_names + 1] = main_project })
   -- for k, v in next, base_links do print(k, v) end
 
   project "example"
@@ -89,9 +87,9 @@ workspace "virtual-addressing"
 
     files { path.join("src", "test", "test_*.cpp") }
 
-    local test_links = table.merge({ [7] = "criterion" }, base_links)
+    local test_links = table.merge(base_links, { [#base_links + 1] = "criterion" })
     test_links = table.reverse(test_links)
-    -- for k, v in next, test_links do print(k, v) end
+    -- print ("old", #base_links, "new", #test_links) for k, v in next, test_links do print(k, v) end
 
     links ( test_links )
 

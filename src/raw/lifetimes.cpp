@@ -4,86 +4,51 @@
 namespace virtual_addressing {
   namespace lifetimes {
 
-    namespace triple_building {
+    virtaddr_t copy (const virtaddr_t va) {
+      const index_t count_triples = attributes::metadata::deducing::real_length(va);
+      virtaddr_t copy = static_cast<virtaddr_t> (std::memcpy(
+        alloc(virtaddr_t, 1),
+        va,
+        nbytes(triple_t, count_triples)
+      ));
 
-      /*
-        the leading triple in any virtaddr_t
-        the arguments will be stored in the same order as they are given here
-      */
-      triple_t first_triple (const value_t count_triples, const value_t virtual_length, const triple_flags::flag_holder_t fls) {
-        static const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {count_triples, virtual_length, (value_t) fls};
-
-        return
-          (triple_t)
-          std::memcpy(alloc(value_t, TRIPLE_LENGTH), stack_data, nbytes(value_t, TRIPLE_LENGTH));
+      // copy sub-pointers here
+      for (size_t i = 1; i < count_triples - 1; i++) {
+        copy[i] = triples::lifetimes::copy(va[i]);
       }
 
-      /*
-        make any triple
-      */
-      triple_t triple (const value_t value, const value_t zeroes) {
-        static const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {value, zeroes, 0};
-
-        return
-          (triple_t)
-          std::memcpy(alloc(triple_atom_t, TRIPLE_LENGTH), stack_data, nbytes(triple_atom_t, TRIPLE_LENGTH));
-      }
-
-      triple_t triple (const value_t value, const index_t bottom, const index_t top) {
-        static const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {value, bottom, top};
-
-        return
-          (triple_t)
-          std::memcpy(alloc(triple_atom_t, TRIPLE_LENGTH), stack_data, nbytes(triple_atom_t, TRIPLE_LENGTH));
-      }
-    }
-
-    namespace copying {
-      virtaddr_t copy (const virtaddr_t va) {
-        const index_t count_triples = virtual_addressing::attributes::metadata::deducing::real_length(va);
-        virtaddr_t copy = static_cast<virtaddr_t> (std::memcpy(
-          alloc(virtaddr_t, 1),
-          va,
-          nbytes(triple_t, count_triples)
-        ));
-
-        // copy sub-pointers here
-        for (size_t i = 1; i < count_triples - 1; i++) {
-          copy[i] = static_cast<triple_t> (std::memcpy(
-            alloc(triple_t, 1),
-            va[i],
-            nbytes(value_t, TRIPLE_LENGTH))
-          );
-        }
-
-        return copy;
-      }
+      return copy;
     }
 
     // the KERNEL hath giveth,
-    virtaddr_t giveth (const triple_flags::flag_holder_t fls) {
+    virtaddr_t giveth (void) {
+      return lifetimes::giveth( triples::flags::flag_holder_t {} );
+    }
+
+    virtaddr_t giveth (const triples::flags::flag_holder_t fls) {
 
       static const index_t empty_triple_count = 2;
 
       virtaddr_t res = static_cast<virtaddr_t> alloc(triple_atom_t*, empty_triple_count);
-      res[0] = lifetimes::triple_building::first_triple(0, 0, (value_t) fls);
+      res[0] = triples::lifetimes::first_triple(0, 0, (value_t) fls);
       res[1] = nullptr;
       return res;
     }
 
-    virtaddr_t giveth (const index_t length, const triple_flags::flag_holder_t fls) {
+    virtaddr_t giveth (const index_t length, const triples::flags::flag_holder_t fls) {
 
       virtaddr_t res = static_cast<virtaddr_t> alloc(triple_atom_t*, length);
-      res[0] = lifetimes::triple_building::first_triple(0, 0, (value_t) fls);
+
+      res[0] = triples::lifetimes::first_triple(0, 0, (value_t) fls);
       for (size_t i = 1; i < length - 1; i++) {
         // for 0s as arguments, the result is the same between make_triple candidates
-        res[i] = lifetimes::triple_building::triple(0, 0, 0);
+        res[i] = triples::lifetimes::triple(0, 0, 0);
       }
       res[ length - 1 ] = nullptr;
       return res;
     }
 
-    virtaddr_t giveth (const value_t* source, const index_t length, const triple_flags::flag_holder_t fls) {
+    virtaddr_t giveth (const value_t* source, const index_t length, const triples::flags::flag_holder_t fls) {
       (void) fls;
       (void) length;
       (void) source;
@@ -91,14 +56,19 @@ namespace virtual_addressing {
     }
 
     // and the KERNEL hath taken away; blessed be the name of the KERNEL.
+    /*
+      every pointer passed to this function must have at least 1 free-able element
+      i.e it must be a "valid" (even if zero length) virtaddr array
+    */
     void taketh (const virtaddr_t vaddr) {
-      const index_t count_triples = virtual_addressing::attributes::metadata::deducing::real_length(vaddr);
+      const index_t count_triples = attributes::metadata::deducing::real_length(vaddr);
 
       if (count_triples > 0) {
-        for (size_t i = 0; i < count_triples; i++) {
+        for (size_t i = 1; i < count_triples; i++) {
           std::free( vaddr[i] );
         }
       }
+      std::free( vaddr[0] );
       std::free( vaddr );
     }
 

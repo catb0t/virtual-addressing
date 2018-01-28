@@ -5,6 +5,7 @@
 #include <cstdarg>
 #include <cstddef>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 
 #ifndef alloc
@@ -41,62 +42,111 @@ namespace virtual_addressing {
   */
   typedef triple_atom_t** virtaddr_t;
 
-  namespace triple_flags {
-    typedef enum /* en_flags_t */ {
-      /*
-        set = slice; unset = count
+  namespace triples {
+    namespace flags {
+      typedef enum /* en_flag_each_t */ {
+        /*
+          set = slice; unset = count
 
-        whether this vaddr array is using slice or count notation.
+          whether this vaddr array is using slice or count notation.
 
-        see file `impl.md`.
+          see file `impl.md`.
 
-        in the case of count notation (the default),
-          the first element of each triple is a non-zero value.
-          the second element of each triple is a maybe-zero number of zeroes which virtually precede the first element.
-          the third and final element of each triple is ignored (it may be zero or junk).
+          in the case of count notation (the default),
+            the first element of each triple is a non-zero value.
+            the second element of each triple is a maybe-zero number of zeroes which virtually precede the first element.
+            the third and final element of each triple is ignored (it may be zero or junk).
 
-        in the case of slice notation,
-          the first element of each triple is a non-zero value. (as above)
-          the second element of each triple is the inclusive lower bound of the zero slice which virtually precedes the value.
-          the and final third element of each triple is the exclusive upper bound of the zero slice.
+          in the case of slice notation,
+            the first element of each triple is a non-zero value. (as above)
+            the second element of each triple is the inclusive lower bound of the zero slice which virtually precedes the value.
+            the and final third element of each triple is the exclusive upper bound of the zero slice.
 
-      */
-      FLAG_NOTATION,
+        */
+        FLAG_NOTATION = 0,
 
-      /*
-        the terminating flag in the enum; not used / usable as a real value
-      */
-      FLAG_LAST_FLAG
-    } flag_each_t;
+        /*
+          the terminating flag in the enum; not used / usable as a real value
+        */
+        FLAG_LAST_FLAG
+      } flag_each_t;
 
-    typedef value_t flag_holder_t;
-  }
+      typedef value_t flag_holder_t;
 
-  namespace lifetimes {
+      flag_holder_t holder (const flag_each_t* fl);
+      bool has (const flag_holder_t, const flag_each_t);
+    }
 
-    namespace triple_building {
-      triple_t first_triple (const value_t, const value_t, const triple_flags::flag_holder_t);
+    namespace attributes {}
+    namespace lifetimes {
+      triple_t first_triple (const value_t, const value_t, const triples::flags::flag_holder_t);
 
       triple_t triple (const value_t, const value_t);
       triple_t triple (const value_t, const index_t, const index_t);
+
+      triple_t copy (const triple_t);
+      triple_t copy (const triple_atom_t* const);
+    }
+    namespace mutations {}
+  }
+
+  namespace attributes {
+    namespace metadata {
+      namespace getting {
+        triples::flags::flag_holder_t flags (const virtaddr_t);
+        bool                         flag (const virtaddr_t, triples::flags::flag_each_t);
+
+        bool notation_flag (const virtaddr_t);
+
+        index_t virtual_length (const virtaddr_t);
+        index_t    real_length (const virtaddr_t);
+      }
+
+      namespace setting {
+        virtaddr_t flags (const virtaddr_t, triples::flags::flag_holder_t);
+        virtaddr_t  flag (const virtaddr_t, triples::flags::flag_each_t, triples::flags::flag_each_t);
+
+        virtaddr_t notation_flag (const virtaddr_t, const bool);
+
+        virtaddr_t virtual_length (const virtaddr_t, const value_t);
+        virtaddr_t    real_length (const virtaddr_t, const value_t);
+      }
+
+
+      namespace deducing {
+        triples::flags::flag_holder_t flags (const virtaddr_t, const bool = false);
+        bool                         flag (const virtaddr_t, triples::flags::flag_each_t, const bool = false);
+
+        bool notation_flag (const virtaddr_t, const bool = false);
+
+        index_t virtual_length (const virtaddr_t, const bool = false);
+        index_t    real_length (const virtaddr_t);
+      }
+
     }
 
-    namespace copying {
-      virtaddr_t copy (const virtaddr_t);
+    namespace slices {
+      virtaddr_t to_slice_notation (const virtaddr_t, const bool = false);
+      virtaddr_t to_count_notation (const virtaddr_t, const bool = false);
     }
-
-    virtaddr_t giveth (const triple_flags::flag_holder_t);
-    virtaddr_t giveth (const index_t , const triple_flags::flag_holder_t);
-    virtaddr_t giveth (const value_t*, const index_t, const triple_flags::flag_holder_t);
-
-    void taketh (const virtaddr_t);
-    void taketh (const virtaddr_t*, const index_t);
-    void taketh (const index_t, const virtaddr_t, ...);
   }
 
   namespace ctypes {
     namespace in {}
     namespace out {}
+  }
+
+  namespace lifetimes {
+    virtaddr_t giveth (void);
+    virtaddr_t giveth (const triples::flags::flag_holder_t);
+    virtaddr_t giveth (const index_t , const triples::flags::flag_holder_t);
+    virtaddr_t giveth (const value_t*, const index_t, const triples::flags::flag_holder_t);
+
+    virtaddr_t copy (const virtaddr_t);
+
+    void taketh (const virtaddr_t);
+    void taketh (const virtaddr_t*, const index_t);
+    void taketh (const index_t, const virtaddr_t, ...);
   }
 
   namespace locations {
@@ -117,47 +167,6 @@ namespace virtual_addressing {
   namespace mutations {
     namespace modifying {}
     namespace transforming {}
-  }
-
-  namespace attributes {
-    namespace metadata {
-      namespace getting {
-        triple_flags::flag_holder_t flags (const virtaddr_t);
-        bool                         flag (const virtaddr_t, triple_flags::flag_each_t);
-
-        bool notation_flag (const virtaddr_t);
-
-        index_t virtual_length (const virtaddr_t);
-        index_t    real_length (const virtaddr_t);
-      }
-
-      namespace setting {
-        virtaddr_t flags (const virtaddr_t, triple_flags::flag_holder_t);
-        virtaddr_t  flag (const virtaddr_t, triple_flags::flag_each_t, triple_flags::flag_each_t);
-
-        virtaddr_t notation_flag (const virtaddr_t, const bool);
-
-        virtaddr_t virtual_length (const virtaddr_t, const value_t);
-        virtaddr_t    real_length (const virtaddr_t, const value_t);
-      }
-
-
-      namespace deducing {
-        triple_flags::flag_holder_t flags (const virtaddr_t, const bool = false);
-        bool                         flag (const virtaddr_t, triple_flags::flag_each_t, const bool = false);
-
-        bool notation_flag (const virtaddr_t, const bool = false);
-
-        index_t virtual_length (const virtaddr_t, const bool = false);
-        index_t    real_length (const virtaddr_t);
-      }
-
-    }
-
-    namespace slices {
-      virtaddr_t to_slice_notation (const virtaddr_t, const bool = false);
-      virtaddr_t to_count_notation (const virtaddr_t, const bool = false);
-    }
   }
 
   namespace visualisations {

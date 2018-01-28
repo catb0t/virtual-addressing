@@ -5,6 +5,7 @@
   the project namespace
 */
 namespace virtual_addressing {
+
   /*
     the file's namespace
   */
@@ -23,15 +24,15 @@ namespace virtual_addressing {
         /*
           get all the flags in the virtaddr
         */
-        triple_flags::flag_holder_t flags (const virtaddr_t va) {
-          return (triple_flags::flag_holder_t) va[0][2];
+        triples::flags::flag_holder_t flags (const virtaddr_t va) {
+          return (triples::flags::flag_holder_t) va[0][2];
         }
 
         /*
           get 1 flag from the virtaddr
         */
-        bool flag (const virtaddr_t va, triple_flags::flag_each_t fl) {
-          return (bool) true & (getting::flags(va) >> fl);
+        bool flag (const virtaddr_t va, triples::flags::flag_each_t fl) {
+          return triples::flags::has( getting::flags(va), fl );
         }
 
         /*
@@ -40,7 +41,7 @@ namespace virtual_addressing {
           returns true for slice, false for count
         */
         bool notation_flag (const virtaddr_t va) {
-          return getting::flag(va, triple_flags::flag_each_t::FLAG_NOTATION);
+          return getting::flag(va, triples::flags::flag_each_t::FLAG_NOTATION);
         }
 
         /*
@@ -62,21 +63,21 @@ namespace virtual_addressing {
       /* naive ! results must be freed */
       namespace setting {
         virtaddr_t real_length (const virtaddr_t va, const value_t new_real_length)    {
-          virtaddr_t copy = virtual_addressing::lifetimes::copying::copy(va);
+          virtaddr_t copy = virtual_addressing::lifetimes::copy(va);
 
           copy[0][0] = new_real_length;
           return copy;
         }
 
         virtaddr_t virtual_length (const virtaddr_t va, const value_t new_virtual_length) {
-          virtaddr_t copy = virtual_addressing::lifetimes::copying::copy(va);
+          virtaddr_t copy = virtual_addressing::lifetimes::copy(va);
 
           copy[0][1] = new_virtual_length;
           return copy;
         }
 
         virtaddr_t notation_flag (const virtaddr_t va, const bool state) {
-          virtaddr_t copy = virtual_addressing::lifetimes::copying::copy(va);
+          virtaddr_t copy = virtual_addressing::lifetimes::copy(va);
 
           copy[0][2] = state;
           return copy;
@@ -84,11 +85,11 @@ namespace virtual_addressing {
       }
 
       namespace deducing {
-        triple_flags::flag_holder_t flags (const virtaddr_t, const bool /* = false */) {
+        triples::flags::flag_holder_t flags (const virtaddr_t, const bool /* = false */) {
           return 0;
         }
 
-        bool flag (const virtaddr_t, triple_flags::flag_each_t, const bool /* = false */) {
+        bool flag (const virtaddr_t, triples::flags::flag_each_t, const bool /* = false */) {
           return 0;
         }
 
