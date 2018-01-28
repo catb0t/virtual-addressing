@@ -10,8 +10,8 @@ namespace virtual_addressing {
         the leading triple in any virtaddr_t
         the arguments will be stored in the same order as they are given here
       */
-      triple_t first_triple (const value_t count_triples, const value_t virtual_length, const bool range_notation) {
-        static const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {count_triples, virtual_length, (value_t) range_notation};
+      triple_t first_triple (const value_t count_triples, const value_t virtual_length, const triple_flags::flag_holder_t fls) {
+        static const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {count_triples, virtual_length, (value_t) fls};
 
         return
           (triple_t)
@@ -61,20 +61,20 @@ namespace virtual_addressing {
     }
 
     // the KERNEL hath giveth,
-    virtaddr_t giveth (const bool use_range_notation) {
+    virtaddr_t giveth (const triple_flags::flag_holder_t fls) {
 
       static const index_t empty_triple_count = 2;
 
       virtaddr_t res = static_cast<virtaddr_t> alloc(triple_atom_t*, empty_triple_count);
-      res[0] = lifetimes::triple_building::first_triple(0, 0, use_range_notation);
+      res[0] = lifetimes::triple_building::first_triple(0, 0, (value_t) fls);
       res[1] = nullptr;
       return res;
     }
 
-    virtaddr_t giveth (const index_t length, const bool use_range_notation) {
+    virtaddr_t giveth (const index_t length, const triple_flags::flag_holder_t fls) {
 
       virtaddr_t res = static_cast<virtaddr_t> alloc(triple_atom_t*, length);
-      res[0] = lifetimes::triple_building::first_triple(0, 0, use_range_notation);
+      res[0] = lifetimes::triple_building::first_triple(0, 0, (value_t) fls);
       for (size_t i = 1; i < length - 1; i++) {
         // for 0s as arguments, the result is the same between make_triple candidates
         res[i] = lifetimes::triple_building::triple(0, 0, 0);
@@ -83,8 +83,8 @@ namespace virtual_addressing {
       return res;
     }
 
-    virtaddr_t giveth (const value_t* source, const index_t length, const bool use_range_notation) {
-      (void) use_range_notation;
+    virtaddr_t giveth (const value_t* source, const index_t length, const triple_flags::flag_holder_t fls) {
+      (void) fls;
       (void) length;
       (void) source;
       return {};

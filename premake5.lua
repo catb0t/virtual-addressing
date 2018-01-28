@@ -16,13 +16,13 @@ workspace "virtual-addressing"
 
   flags { "fatalwarnings" }
 
-  buildoptions { "-Wl,--no-as-needed" }
+  --buildoptions { "-Wl,--no-as-needed" }
 
   targetdir "bin/%{cfg.buildcfg}/"
 
   filter { "action:gmake*" }
     buildoptions {
-      "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror",
+      "-Wall", "-std=c++11", "-Wextra", "-Wfloat-equal", "-Winline", "-Wundef", "-Werror", "--pedantic-errors", "-Wpedantic", "-pedantic",
       "-fverbose-asm", "-Wint-to-pointer-cast", "-Wshadow", "-Wpointer-arith",
       "-Wcast-align", "-Wcast-qual", "-Wunreachable-code", "-Wstrict-overflow=5",
       "-Wwrite-strings", "-Wconversion", "--pedantic-errors",
@@ -45,7 +45,7 @@ workspace "virtual-addressing"
     optimize "off"
 
   filter "configurations:dist"
-    buildoptions { "-fomit-frame-pointer", "-O3" }
+    buildoptions { "-fomit-frame-pointer", "-g", "-O3" }
     symbols "off"
     optimize "full"
 

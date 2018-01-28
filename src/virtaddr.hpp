@@ -41,35 +41,57 @@ namespace virtual_addressing {
   */
   typedef triple_atom_t** virtaddr_t;
 
-  /*struct virtaddr_t {
-    raw_virtaddr_t data;
+  namespace triple_flags {
+    typedef enum /* en_flags_t */ {
+      /*
+        set = slice; unset = count
 
-    virtaddr_t (const bool use_range_notation);
-    virtaddr_t (const virtual_addressing::index_t length, const bool use_range_notation);
-    virtaddr_t (const virtual_addressing::value_t* source, const virtual_addressing::index_t length, const bool use_range_notation);
+        whether this vaddr array is using slice or count notation.
 
-  };*/
+        see file `impl.md`.
+
+        in the case of count notation (the default),
+          the first element of each triple is a non-zero value.
+          the second element of each triple is a maybe-zero number of zeroes which virtually precede the first element.
+          the third and final element of each triple is ignored (it may be zero or junk).
+
+        in the case of slice notation,
+          the first element of each triple is a non-zero value. (as above)
+          the second element of each triple is the inclusive lower bound of the zero slice which virtually precedes the value.
+          the and final third element of each triple is the exclusive upper bound of the zero slice.
+
+      */
+      FLAG_NOTATION,
+
+      /*
+        the terminating flag in the enum; not used / usable as a real value
+      */
+      FLAG_LAST_FLAG
+    } flag_each_t;
+
+    typedef value_t flag_holder_t;
+  }
 
   namespace lifetimes {
 
     namespace triple_building {
-      triple_t first_triple (const value_t count_triples, const value_t virtual_length, const bool range_notation);
+      triple_t first_triple (const value_t, const value_t, const triple_flags::flag_holder_t);
 
-      triple_t triple (const value_t value, const value_t zeroes);
-      triple_t triple (const value_t value, const index_t bottom, const index_t top);
+      triple_t triple (const value_t, const value_t);
+      triple_t triple (const value_t, const index_t, const index_t);
     }
 
     namespace copying {
-      virtaddr_t copy (const virtaddr_t va);
+      virtaddr_t copy (const virtaddr_t);
     }
 
-    virtaddr_t giveth (const bool use_range_notation);
-    virtaddr_t giveth (const index_t length, const bool use_range_notation);
-    virtaddr_t giveth (const value_t* source, const index_t length, const bool use_range_notation);
+    virtaddr_t giveth (const triple_flags::flag_holder_t);
+    virtaddr_t giveth (const index_t , const triple_flags::flag_holder_t);
+    virtaddr_t giveth (const value_t*, const index_t, const triple_flags::flag_holder_t);
 
-    void taketh (const virtaddr_t vaddr);
-    void taketh (const virtaddr_t* vaddr, const index_t length);
-    void taketh (const index_t argc, const virtaddr_t n_vaddr, ...);
+    void taketh (const virtaddr_t);
+    void taketh (const virtaddr_t*, const index_t);
+    void taketh (const index_t, const virtaddr_t, ...);
   }
 
   namespace ctypes {
@@ -79,15 +101,15 @@ namespace virtual_addressing {
 
   namespace locations {
     namespace searching {
-      index_t linear_search (const virtaddr_t, const value_t value);
-      index_t binary_search (const virtaddr_t, const value_t value);
+      index_t linear_search (const virtaddr_t, const value_t);
+      index_t binary_search (const virtaddr_t, const value_t);
     }
     namespace indexing {
-      value_t    get (const virtaddr_t, const index_t index);
-      virtaddr_t set (const virtaddr_t, const index_t index, const value_t value);
+      value_t    get (const virtaddr_t, const index_t);
+      virtaddr_t set (const virtaddr_t, const index_t, const value_t);
 
       namespace implementation {
-        value_t get_linear_search (const virtaddr_t va, const index_t);
+        value_t get_linear_search (const virtaddr_t, const index_t);
       }
     }
   }
@@ -100,29 +122,41 @@ namespace virtual_addressing {
   namespace attributes {
     namespace metadata {
       namespace getting {
-        bool is_range_notation (const virtaddr_t);
+        triple_flags::flag_holder_t flags (const virtaddr_t);
+        bool                         flag (const virtaddr_t, triple_flags::flag_each_t);
+
+        bool notation_flag (const virtaddr_t);
+
         index_t virtual_length (const virtaddr_t);
         index_t    real_length (const virtaddr_t);
       }
 
       namespace setting {
-        virtaddr_t is_range_notation (const virtaddr_t, const bool);
-        virtaddr_t    virtual_length (const virtaddr_t, const value_t);
-        virtaddr_t       real_length (const virtaddr_t, const value_t);
+        virtaddr_t flags (const virtaddr_t, triple_flags::flag_holder_t);
+        virtaddr_t  flag (const virtaddr_t, triple_flags::flag_each_t, triple_flags::flag_each_t);
+
+        virtaddr_t notation_flag (const virtaddr_t, const bool);
+
+        virtaddr_t virtual_length (const virtaddr_t, const value_t);
+        virtaddr_t    real_length (const virtaddr_t, const value_t);
       }
 
 
       namespace deducing {
-        bool is_range_notation (const virtaddr_t);
-        index_t virtual_length (const virtaddr_t);
+        triple_flags::flag_holder_t flags (const virtaddr_t, const bool = false);
+        bool                         flag (const virtaddr_t, triple_flags::flag_each_t, const bool = false);
+
+        bool notation_flag (const virtaddr_t, const bool = false);
+
+        index_t virtual_length (const virtaddr_t, const bool = false);
         index_t    real_length (const virtaddr_t);
       }
 
     }
 
-    namespace ranges {
-      virtaddr_t to_range_notation (const virtaddr_t);
-      virtaddr_t to_count_notation (const virtaddr_t);
+    namespace slices {
+      virtaddr_t to_slice_notation (const virtaddr_t, const bool = false);
+      virtaddr_t to_count_notation (const virtaddr_t, const bool = false);
     }
   }
 

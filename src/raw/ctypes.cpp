@@ -3,7 +3,17 @@
 
 namespace virtual_addressing {
     namespace ctypes {
-    namespace in {}
-    namespace out {}
+    namespace in {
+
+      namespace implementation {
+
+      }
+    }
+    namespace out {
+
+      namespace implementation {
+
+      }
+    }
   }
 }
