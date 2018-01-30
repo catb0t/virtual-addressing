@@ -43,7 +43,9 @@ namespace virtual_addressing {
   typedef triple_atom_t** virtaddr_t;
 
   namespace debugging {
-    void say (const char* const, ...);
+    void say (const char* const,...);
+    void see (const char* const, const triple_t);
+    void see (const char* const, const virtaddr_t);
   }
 
   namespace triples {
@@ -208,7 +210,9 @@ namespace virtual_addressing {
 
   namespace visualisations {
     namespace in {}
-    namespace out {}
+    namespace out {
+      char* repr (const virtaddr_t);
+    }
   }
 
 }

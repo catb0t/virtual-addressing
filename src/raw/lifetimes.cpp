@@ -42,7 +42,7 @@ namespace virtual_addressing {
       res[0] = triples::lifetimes::first_triple(0, 0, (value_t) fls);
       for (size_t i = 1; i < length - 1; i++) {
         // for 0s as arguments, the result is the same between make_triple candidates
-        res[i] = triples::lifetimes::giveth(0, 0, 0);
+        res[i] = triples::lifetimes::giveth();
       }
       res[ length - 1 ] = nullptr;
       return res;

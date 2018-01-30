@@ -25,7 +25,9 @@ namespace virtual_addressing {
           get all the flags in the virtaddr
         */
         triples::flags::flag_holder_t flags (const virtaddr_t va) {
-          return (triples::flags::flag_holder_t) va[0][2];
+          return
+            (triples::flags::flag_holder_t)
+            triples::attributes::metadata::getting::third(va[0]);
         }
 
         /*

@@ -63,7 +63,6 @@ namespace virtual_addressing {
           total |= 1U << fl[i];
         }
 
-        virtual_addressing::debugging::say("total", 1);
         return total;
       }
 
