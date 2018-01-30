@@ -42,6 +42,10 @@ namespace virtual_addressing {
   */
   typedef triple_atom_t** virtaddr_t;
 
+  namespace debugging {
+    void say (const char* const, ...);
+  }
+
   namespace triples {
     namespace flags {
       typedef enum /* en_flag_each_t */ {
@@ -80,6 +84,7 @@ namespace virtual_addressing {
     }
 
     namespace attributes {
+
       namespace metadata {
         namespace getting {
           triple_atom_t  first (const triple_t);
@@ -110,7 +115,7 @@ namespace virtual_addressing {
 
       triple_t giveth (void);
       triple_t giveth (const value_t, const value_t);
-      triple_t giveth (const value_t, const index_t, const index_t);
+      triple_t giveth (const value_t, const value_t, const value_t);
 
       triple_t copy (const triple_t);
       triple_t copy (const triple_atom_t* const);

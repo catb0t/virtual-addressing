@@ -16,7 +16,7 @@ workspace "virtual-addressing"
 
   flags { "fatalwarnings" }
 
-  --buildoptions { "-Wl,--no-as-needed" }
+  buildoptions { "-Wl,--no-as-needed" }
 
   targetdir "bin/%{cfg.buildcfg}/"
 
@@ -37,14 +37,16 @@ workspace "virtual-addressing"
 
 
   filter "configurations:dbg"
+    --defines { "VIRTADDR_DEBUG" }
     buildoptions {
-      "-ggdb", "-O0", "-ggdb3", "-fno-omit-frame-pointer"
+      "-O0", "-ggdb3", "-fno-omit-frame-pointer"
       -- "-fsanitize=address", "-fstack-protector", "-fsanitize=undefined"
     }
     symbols "on"
     optimize "off"
 
   filter "configurations:dist"
+    --defines { "VIRTADDR_GOFAST" }
     buildoptions { "-fomit-frame-pointer", "-O3" }
     symbols "off"
     optimize "full"
@@ -69,7 +71,7 @@ workspace "virtual-addressing"
 
   local main_project = "virt_addr"
   local base_links = table.merge(proj_names, { [#proj_names + 1] = main_project })
-  -- for k, v in next, base_links do print(k, v) end
+  for k, v in next, base_links do print(k, v) end
 
   project "example"
     kind "consoleapp"
@@ -88,8 +90,8 @@ workspace "virtual-addressing"
     files { path.join("src", "test", "test_*.cpp") }
 
     local test_links = table.merge(base_links, { [#base_links + 1] = "criterion" })
-    test_links = table.reverse(test_links)
-    -- print ("old", #base_links, "new", #test_links) for k, v in next, test_links do print(k, v) end
+    --test_links = table.reverse(test_links)
+    --print ("old", #base_links, "new", #test_links) for k, v in next, test_links do print(k, v) end
 
     links ( test_links )
 

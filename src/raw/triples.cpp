@@ -4,7 +4,50 @@
 namespace virtual_addressing {
   namespace triples {
     namespace attributes {
+      namespace metadata {
+        namespace getting {
+          triple_atom_t  first (const triple_t trp) {
+            return trp[0];
+          }
+          triple_atom_t second (const triple_t trp) {
+            return trp[1];
+          }
+          triple_atom_t  third (const triple_t trp) {
+            return trp[2];
+          }
+        }
 
+        namespace setting {
+          triple_t  first (const triple_atom_t atom) {
+            return triples::lifetimes::giveth(atom, 0, 0);
+          }
+          triple_t second (const triple_atom_t atom) {
+            return triples::lifetimes::giveth(0, atom, 0);
+          }
+          triple_t  third (const triple_atom_t atom) {
+            return triples::lifetimes::giveth(0, 0, atom);
+          }
+        }
+
+        namespace deducing {
+          triple_atom_t third (const triple_t trp) {
+            const triple_atom_t trp3 = metadata::getting::third(trp);
+            return
+              metadata::getting::second(trp) <= trp3
+              ? trp3
+              : 0;
+          }
+        }
+      }
+
+      namespace slices {
+        virtaddr_t to_slice_notation (const virtaddr_t, const bool /* = false */) {
+          return {};
+        }
+        virtaddr_t to_count_notation (const virtaddr_t, const bool /* = false */) {
+          return {};
+        }
+      }
     }
 
     namespace flags {
@@ -20,7 +63,7 @@ namespace virtual_addressing {
           total |= 1U << fl[i];
         }
 
-        std::printf("total: %lu\n", total);
+        virtual_addressing::debugging::say("total", 1);
         return total;
       }
 
@@ -83,7 +126,7 @@ namespace virtual_addressing {
 
         for (size_t i = 0; i < argc; i++) {
           auto t = static_cast<triple_t> (va_arg(va, triple_t));
-          taketh(t);
+          triples::lifetimes::taketh(t);
         }
         va_end(va);
       }
