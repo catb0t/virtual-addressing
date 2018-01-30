@@ -80,7 +80,11 @@ namespace virtual_addressing {
         the arguments will be stored in the same order as they are given here
       */
       triple_t first_triple (const value_t count_triples, const value_t virtual_length, const triples::flags::flag_holder_t fls) {
-        const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {count_triples, virtual_length, (value_t) fls};
+        const triple_atom_t stack_data[ TRIPLE_LENGTH ] = {
+          count_triples,
+          virtual_length,
+          value_t(fls)
+        };
 
         return triples::lifetimes::copy(stack_data);
       }

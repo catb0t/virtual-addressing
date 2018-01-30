@@ -12,7 +12,7 @@ workspace "virtual-addressing"
 
   cppdialect "C++11"
 
-  configurations { "dbg", "dist" }
+  configurations { "dbg", "dist", "test" }
 
   flags { "fatalwarnings" }
 
@@ -37,7 +37,7 @@ workspace "virtual-addressing"
 
 
   filter "configurations:dbg"
-    --defines { "VIRTADDR_DEBUG" }
+    defines { "VIRTADDR_DEBUG" }
     buildoptions {
       "-O0", "-ggdb3", "-fno-omit-frame-pointer"
       -- "-fsanitize=address", "-fstack-protector", "-fsanitize=undefined"
@@ -46,10 +46,17 @@ workspace "virtual-addressing"
     optimize "off"
 
   filter "configurations:dist"
-    --defines { "VIRTADDR_GOFAST" }
+    defines { "VIRTADDR_GOFAST" }
     buildoptions { "-fomit-frame-pointer", "-O3" }
     symbols "off"
     optimize "full"
+
+  filter "configurations:test"
+    defines { "VIRTADDR_GOFAST" }
+    buildoptions { "-fomit-frame-pointer" }
+    symbols "off"
+    --optimize "on"
+
 
   filter {}
 
@@ -84,7 +91,7 @@ workspace "virtual-addressing"
     -- don't link main_project to itself
     links ( proj_names )
 
-  project "test"
+  project "tests"
     kind "consoleapp"
 
     files { path.join("src", "test", "test_*.cpp") }
