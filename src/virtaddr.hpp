@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cassert>
+#include <cerrno>
 
 #ifndef alloc
   #define alloc(type, size) (std::malloc(( nbytes(type, size) )))
@@ -43,9 +45,15 @@ namespace virtual_addressing {
   typedef triple_atom_t** virtaddr_t;
 
   namespace debugging {
-    void say (const char* const,...);
+    void say (const char* const, ...);
     void see (const char* const, const triple_t);
     void see (const char* const, const virtaddr_t);
+  }
+
+  namespace utilities {
+    size_t subtract_unsigned (const size_t, const size_t);
+    void say (const void* const, const size_t);
+    void see (const void* const, const size_t* const);
   }
 
   namespace triples {
@@ -84,34 +92,29 @@ namespace virtual_addressing {
 
       bool has (const flag_holder_t, const flag_each_t);
     }
-
+    /* triples */
     namespace attributes {
-
       namespace metadata {
         namespace getting {
           triple_atom_t  first (const triple_t);
           triple_atom_t second (const triple_t);
           triple_atom_t  third (const triple_t);
         }
-
         namespace setting {
           triple_t  first (const triple_atom_t);
           triple_t second (const triple_atom_t);
           triple_t  third (const triple_atom_t);
-
         }
-
         namespace deducing {
           triple_atom_t third (const triple_t);
+          bool notation_guess (const triple_t trp);
         }
       }
-
       namespace slices {
-        virtaddr_t to_slice_notation (const virtaddr_t, const bool = false);
-        virtaddr_t to_count_notation (const virtaddr_t, const bool = false);
+        triple_t to_slice_notation (const triple_t, const triple_t, const bool = false);        triple_t to_count_notation (const triple_t, const bool = false);
       }
     }
-
+    /* triples */
     namespace lifetimes {
       triple_t first_triple (const value_t, const value_t, const triples::flags::flag_holder_t);
 
@@ -129,6 +132,7 @@ namespace virtual_addressing {
     namespace mutations {}
   }
 
+  /* virtual addressing again */
   namespace attributes {
     namespace metadata {
       namespace getting {
@@ -211,7 +215,7 @@ namespace virtual_addressing {
   namespace visualisations {
     namespace in {}
     namespace out {
-      char* repr (const virtaddr_t);
+      //char* repr (const virtaddr_t);
     }
   }
 

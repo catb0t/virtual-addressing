@@ -1,4 +1,4 @@
-# virtual-addressing
+# virtual-addressing [![Build Status](https://travis-ci.org/catb0t/virtual-addressing.svg?branch=master)](https://travis-ci.org/catb0t/virtual-addressing)
 
 ---
 

@@ -19,48 +19,69 @@
 
 a vaddr (virtual address object) is a two-dimensional array. its elements are "triples", which are 2 or 3-element arrays of `uint64_t`.
 
-when F (flags) has the lowest bit set, FEATURE_SLICE (explicit slicing notation) is not enabled.
+when F (flags) has the lowest bit set, `FEATURE_SLICE` (explicit slicing notation) is not enabled.
 
 the structure in this case is
 ```
 A = [
-  [L S F] - L: number of triples following S: spoofing virtual length F: flags
-  [V Z X] - V: a non-zero value Z: the number of zeroes preceding V X: unused
-  [V Z X] - ...
+  [L S F]
+  [V Z X]
+  [V Z X]
   ...
   NULL  - a null terminator, for simpler iteration.
 ]
 ```
+
+where
+* `L` the number of triples following
+* `S` spoofing virtual length
+* `F` flags
+* `V` a non-zero value
+* `Z` the number of zeroes virtually preceding V
+* `X` unused
 
 this "counting" notation is the default. Z counts the real number of zeroes which follow the value V of the previous data triple, but which precede the value V in the current data triple.
 
-in order to look up a (zero) value by virtual index, you must sum the number of virtual elements represented by all previous triples.  
+in order to look up a zero value by virtual index, you must sum the number of virtual elements represented by Z fields in all previous triples.  
 
-when F (flags) has the lowest bit set, FEATURE_SLICE (explicit slicing notation) is enabled.
+when F (flags) has the lowest bit set, `FEATURE_SLICE` (explicit slicing notation) is enabled.
 
 the structure in this case is
 ```
 A = [
-  [L S F] - L: number of triples following S: spoofing virtual length F: flags
-  [V B T] - V: a non-zero value B: the bottom inclusive index of zero range T: the top exclusive index of zero range
-  [V B T] - ...
+  [L S F]
+  [V B T]
+  [V B T]
   ...
   NULL  - a null terminator, for simpler iteration.
 ]
 ```
-B describes the lower (bottom) inclusive bound of the slice. T describes the upper (top) exclusive bound of the slice.
-The index named by B, and all indicies after it which are strictly less than T, are represented by the slice B T.
+
+where
+* `L` the number of triples following
+* `S` spoofing virtual length
+* `F` flags
+* `V` a non-zero value
+* `B` the bottom inclusive index of the zero range
+* `T` the top exclusive index of the zero range
+
+In other words, B describes the lower (bottom) inclusive bound of the slice and T describes the upper (top) exclusive bound of the slice.
+The index named by B, and all indicies after it which are strictly less than T, are represented by the slice `B T`.
 ```
   0 0  = length: 0  indicies with zeroes: (none)
   0 1  = length: 1  indicies with zeroes: 0
   0 2  = length: 2  indicies with zeroes: 0, 1
   8 20 = length: 12 indicies with zeroes: 8, ..., 19
 
-  8 2  = invalid slice, interepreted as count notation
-```  
+  0  10 = length: 10 indicies with zeroes: 0, ... 9
+  11 13 = length: 2  indicies with zeroes: 11, 12
 
+  8 2  = invalid slice, interepreted as count: 8
+```
 
-on x86-64, the memory used by either structure for N non-zero values is
+In order to look up a zero value by virtual index, you can search linearly from the first triple forward. However, because virtual index context is kept with each triple in this format, it is possible and faster to binary search beginning from some middle-ish position 
+
+on x86-64, the memory used by the structure for `N` non-zero values is
 
 ```
 ( 8 * 3 * (N + 1) ) + 8

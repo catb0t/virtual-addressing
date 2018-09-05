@@ -33,30 +33,27 @@ workspace "virtual-addressing"
     buildoptions {
       "-Werror=maybe-uninitialized"
     }
-    flags { "linktimeoptimization" }
-
 
   filter "configurations:dbg"
     defines { "VIRTADDR_DEBUG" }
     buildoptions {
       "-O0", "-ggdb3", "-fno-omit-frame-pointer"
-      -- "-fsanitize=address", "-fstack-protector", "-fsanitize=undefined"
     }
     symbols "on"
     optimize "off"
 
+  -- tests will not run!!
   filter "configurations:dist"
     defines { "VIRTADDR_GOFAST" }
     buildoptions { "-fomit-frame-pointer", "-O3" }
     symbols "off"
     optimize "full"
+    flags { "linktimeoptimization" }
 
   filter "configurations:test"
     defines { "VIRTADDR_GOFAST" }
     buildoptions { "-fomit-frame-pointer" }
     symbols "off"
-    --optimize "on"
-
 
   filter {}
 
@@ -75,6 +72,7 @@ workspace "virtual-addressing"
 
     project "*"
   end
+  table.sort(proj_names)
 
   local main_project = "virt_addr"
   local base_links = table.merge(proj_names, { [#proj_names + 1] = main_project })
