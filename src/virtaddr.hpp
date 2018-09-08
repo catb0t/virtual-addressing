@@ -11,7 +11,7 @@
 #include <cerrno>
 
 #ifndef alloc
-  #define alloc(type, size) (std::malloc(( nbytes(type, size) )))
+  #define alloc(type, size) (static_cast<type*> (std::malloc(( nbytes(type, size) ))))
 #endif
 
 #ifndef set_out_param

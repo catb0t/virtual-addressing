@@ -61,7 +61,7 @@ namespace virtual_addressing {
       i.e it must be a "valid" (even if zero length) virtaddr array
     */
     void taketh (const virtaddr_t vaddr) {
-      const index_t count_triples = attributes::metadata::deducing::real_length(vaddr);
+      const index_t count_triples = /* should this be +1???? */attributes::metadata::deducing::real_length(vaddr);
 
       if (count_triples > 0) {
         for (size_t i = 1; i < count_triples; i++) {
